@@ -87,8 +87,8 @@ class DossierVisite
     private $langues;
 
     /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\PaysDestination", inversedBy="dossiers",cascade={"persist"})
-     * @ORM\JoinColumn(nullable=false)
+     * @ORM\ManyToOne(targetEntity="App\Entity\PaysDestination", inversedBy="dossiers")
+     * @ORM\JoinColumn(nullable=true)
      */
     private $paysDestination;
 

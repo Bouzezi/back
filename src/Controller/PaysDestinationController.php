@@ -55,7 +55,7 @@ class PaysDestinationController extends AbstractController
     }
 
     /**
-     * @Route("/{id}", name="paysdestination_show", methods={"GET"})
+     * @Route("/{libelle_pays}", name="paysdestination_show", methods={"GET"})
      */
     public function show(PaysDestination $paysdestination): Response
     {

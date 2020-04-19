@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\DossierVisite;
 use App\Entity\PaysDestination;
+use App\Controller\PaysDestinationController;
 use App\Repository\DossierVisiteRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -67,11 +68,7 @@ class DossierVisiteController extends AbstractController
         $langues =  isset($data['langues']) ? $data['langues'] : null;
        $pays_destination_libelle =  isset($data['pays_destination_libelle']) ? $data['pays_destination_libelle'] : null;
         
-        $pays_destination=new PaysDestination();
-        //$pays_destination->setId(1);
-        $pays_destination->setLibellePays($pays_destination_libelle);
-        
-        $dossiervisite->setPaysDestination($pays_destination);
+       
         $dossiervisite->setDateArriveInvitation($date_arrive_invitation);
         $dossiervisite->setDateDebut($date_deb);
         $dossiervisite->setDateFin($date_fin);
@@ -85,20 +82,21 @@ class DossierVisiteController extends AbstractController
         $dossiervisite->setFraisResidence($frais_residence);
         $dossiervisite->setStatut($statut);
         $dossiervisite->setNature($nature);
-        $dossiervisite->setLangues($langues);
-        
-        
-        
+        $dossiervisite->setLangues($langues); 
 
-       // $dossiervisite->setPayeDestination($paye_destination);
-       // $dossiervisite->setVilleDestination($ville_destination);
-        
-            
+        $repository = $this->getDoctrine()->getRepository(PaysDestination::class);
+        $pays_destination = $repository->findOneBy(['libelle_pays' => $pays_destination_libelle]);
 
+            if ($pays_destination) {
+                $dossiervisite->setPaysDestination($pays_destination);
+               
+                //$paysdestination=$dossiervisite->getPaysDestination();
+                //return new JsonResponse($paysdestination->getLibellePays());
+            }
             $entityManager = $this->getDoctrine()->getManager();
-            
             $entityManager->persist($dossiervisite);
-            $entityManager->flush();
+            $entityManager->flush();    
+                
             
             return new JsonResponse($data);
             
