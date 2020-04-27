@@ -92,6 +92,12 @@ class DossierVisite
      */
     private $paysDestination;
 
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\OrganismeEtranger", inversedBy="dossiers")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $organismeEtranger;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -273,6 +279,18 @@ class DossierVisite
     public function setPaysDestination(?PaysDestination $paysDestination): self
     {
         $this->paysDestination = $paysDestination;
+
+        return $this;
+    }
+
+    public function getOrganismeEtranger(): ?OrganismeEtranger
+    {
+        return $this->organismeEtranger;
+    }
+
+    public function setOrganismeEtranger(?OrganismeEtranger $organismeEtranger): self
+    {
+        $this->organismeEtranger = $organismeEtranger;
 
         return $this;
     }
