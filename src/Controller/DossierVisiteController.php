@@ -4,7 +4,11 @@ namespace App\Controller;
 
 use App\Entity\DossierVisite;
 use App\Entity\PaysDestination;
+use App\Entity\OrganismeEtranger;
+use App\Entity\ProgrammeCooperation;
 use App\Controller\PaysDestinationController;
+use App\Controller\OrganismeEtrangerController;
+use App\Controller\ProgrammeCooperationController;
 use App\Repository\DossierVisiteRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -67,8 +71,9 @@ class DossierVisiteController extends AbstractController
         $nature =  isset($data['nature']) ? $data['nature'] : null;
         $langues =  isset($data['langues']) ? $data['langues'] : null;
        $pays_destination_libelle =  isset($data['pays_destination_libelle']) ? $data['pays_destination_libelle'] : null;
-        
-       
+       $organisme_etranger_libelle =  isset($data['organisme_etranger_libelle']) ? $data['organisme_etranger_libelle'] : null; 
+       $programme_libelle =  isset($data['programme_libelle']) ? $data['programme_libelle'] : null; 
+
         $dossiervisite->setDateArriveInvitation($date_arrive_invitation);
         $dossiervisite->setDateDebut($date_deb);
         $dossiervisite->setDateFin($date_fin);
@@ -89,10 +94,19 @@ class DossierVisiteController extends AbstractController
 
             if ($pays_destination) {
                 $dossiervisite->setPaysDestination($pays_destination);
-               
                 //$paysdestination=$dossiervisite->getPaysDestination();
                 //return new JsonResponse($paysdestination->getLibellePays());
             }
+            $repositoryOrg = $this->getDoctrine()->getRepository(OrganismeEtranger::class);
+            $organismeEtranger = $repositoryOrg->findOneBy(['libelle_org' => $organisme_etranger_libelle]);
+            $repositoryProg = $this->getDoctrine()->getRepository(ProgrammeCooperation::class);
+            $programmeCooperation = $repositoryProg->findOneBy(['libelle_prog' => $programme_libelle]);
+    
+                if ($organismeEtranger && $programmeCooperation) {
+                    $organismeEtranger->addOrganismeProgrammes($programmeCooperation);
+                    $dossiervisite->setOrganismeEtranger($organismeEtranger);
+                }
+
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->persist($dossiervisite);
             $entityManager->flush();    

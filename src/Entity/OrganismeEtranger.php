@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Entity;
-
+use App\Entity\ProgrammeCooperation;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -14,7 +14,7 @@ class OrganismeEtranger
     /**
      * @ORM\Id()
      * @ORM\GeneratedValue()
-     * @ORM\Column(type="integer")
+     * @ORM\Column(name="id", type="integer")
      */
     private $id;
 
@@ -27,10 +27,19 @@ class OrganismeEtranger
      * @ORM\OneToMany(targetEntity="App\Entity\DossierVisite", mappedBy="organismeEtranger")
      */
     private $dossiers;
+    /**
+     * @ORM\ManyToMany(targetEntity="ProgrammeCooperation")
+     * @ORM\JoinTable(name="Organisme_Programme",
+     *      joinColumns={@ORM\JoinColumn(name="organisme_id", referencedColumnName="id")},
+     *      inverseJoinColumns={@ORM\JoinColumn(name="programme_id", referencedColumnName="id")}
+     *      )
+     */
+    private $organismeProgrammes;
 
     public function __construct()
     {
         $this->dossiers = new ArrayCollection();
+        $this->organismeProgrammes  = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -79,5 +88,19 @@ class OrganismeEtranger
         }
 
         return $this;
+    }
+
+    public function addOrganismeProgrammes(ProgrammeCooperation $prog){
+
+        // To avoid duplicates 
+        if($this->organismeProgrammes->contains($prog)){
+            return;
+        }
+
+        $this->organismeProgrammes[] = $prog;
+    }
+
+    public function getOrganismeProgrammes(){
+        return $this->organismeProgrammes;
     }
 }
