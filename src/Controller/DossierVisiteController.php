@@ -32,14 +32,21 @@ class DossierVisiteController extends AbstractController
         $datas=array();
         foreach ($dossiers as $key => $dossier){
             $datas[$key]['id'] = $dossier->getId();
-            $datas[$key]['date_arrive_visite'] = $dossier->getDateArriveVisite()->format('Y/m/d');
+            $datas[$key]['date_arrive_visite'] = $dossier->getDateArriveInvitation();
             $datas[$key]['nature'] = $dossier->getNature();
             $datas[$key]['sujet'] = $dossier->getSujet();
-            $datas[$key]['date_deb'] = $dossier->getDateDeb()->format('Y/m/d');;
-            $datas[$key]['date_fin'] = $dossier->getDateFin()->format('Y/m/d');;
-            $datas[$key]['date_limite_rep'] = $dossier->getDateLimiteRep()->format('Y/m/d');;
-            $datas[$key]['paye_destination'] = $dossier->getPayeDestination();
-            $datas[$key]['ville_destination'] = $dossier->getVilleDestination();
+            $datas[$key]['date_deb'] = $dossier->getDateDebut();
+            $datas[$key]['date_fin'] = $dossier->getDateFin();
+            $datas[$key]['type_visite'] = $dossier->getTypeVisite();
+            $datas[$key]['nb_participant_ins'] = $dossier->getNbrParticipantINS();
+            $datas[$key]['nb_participant_sp'] = $dossier->getNbrParticipantSP();
+            $datas[$key]['frais_transport'] = $dossier->getFraisTransport();
+            $datas[$key]['frais_residence'] = $dossier->getFraisResidence();
+            $datas[$key]['date_limite_reponce'] = $dossier->getDateLimiteReponce();
+            $datas[$key]['statut'] = $dossier->getStatut();
+            $datas[$key]['langues'] = $dossier->getLangues();
+            $datas[$key]['pays_destination_id'] = $dossier->getPaysDestination()->getLibellePays();
+            $datas[$key]['organisme_etranger_id'] = $dossier->getOrganismeEtranger()->getLibelleOrg();
             $datas[$key]['annee'] = $dossier->getAnnee();
 
         }
