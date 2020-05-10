@@ -12,7 +12,7 @@ class CadreINS
     /**
      * @ORM\Id()
      * @ORM\GeneratedValue()
-     * @ORM\Column(type="integer")
+     * @ORM\Column(name="id",type="integer")
      */
     private $id;
 
@@ -35,6 +35,12 @@ class CadreINS
      * @ORM\Column(type="string", length=20)
      */
     private $fonction;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\DirectionCentrale", inversedBy="cadres")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $directionCentrale;
 
     public function getId(): ?int
     {
@@ -85,6 +91,18 @@ class CadreINS
     public function setFonction(string $fonction): self
     {
         $this->fonction = $fonction;
+
+        return $this;
+    }
+
+    public function getDirectionCentrale(): ?DirectionCentrale
+    {
+        return $this->directionCentrale;
+    }
+
+    public function setDirectionCentrale(?DirectionCentrale $directionCentrale): self
+    {
+        $this->directionCentrale = $directionCentrale;
 
         return $this;
     }

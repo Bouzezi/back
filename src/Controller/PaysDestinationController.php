@@ -55,15 +55,24 @@ class PaysDestinationController extends AbstractController
     }
 
     /**
-     * @Route("/{libelle_pays}", name="paysdestination_show", methods={"GET"})
+     * @Route("/{id}", name="paysdestination_show", methods={"GET"})
      */
-    public function show(PaysDestination $paysdestination): Response
+    public function show($id): Response
     {
-        
+        $paysdestination = $this->getDoctrine()
+        ->getRepository(PaysDestination::class)
+        ->find($id);
         $datas=array();
-        
+        if (!$paysdestination) {
+            throw $this->createNotFoundException(
+                'No cadre found for id '.$id
+            );
+        }
+        else 
+        {
             $datas[0]['id'] = $paysdestination->getId();
-            $datas[0]['libelle_pays'] = $pays->getLibellePays();
+            $datas[0]['libelle_pays'] = $paysdestination->getLibellePays();
+        }
             
         
         return new JsonResponse($datas);

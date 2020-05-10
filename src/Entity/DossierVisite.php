@@ -12,7 +12,7 @@ class DossierVisite
     /**
      * @ORM\Id()
      * @ORM\GeneratedValue()
-     * @ORM\Column(type="integer")
+     * @ORM\Column(name="id",type="integer")
      */
     private $id;
 
@@ -97,6 +97,15 @@ class DossierVisite
      * @ORM\JoinColumn(nullable=false)
      */
     private $organismeEtranger;
+
+    /**
+     * @ORM\ManyToMany(targetEntity="CadreINS")
+     * @ORM\JoinTable(name="Participation",
+     *      joinColumns={@ORM\JoinColumn(name="visite_id", referencedColumnName="id")},
+     *      inverseJoinColumns={@ORM\JoinColumn(name="cadre_id", referencedColumnName="id")}
+     *      )
+     */
+    private $participation;
 
     public function getId(): ?int
     {
@@ -294,4 +303,13 @@ class DossierVisite
 
         return $this;
     }
+
+    public function addParticipation(CadreINS $cadre){
+        $this->participation[] = $cadre;
+    }
+
+    public function getParticipation(){
+        return $this->participation;
+    }
+
 }

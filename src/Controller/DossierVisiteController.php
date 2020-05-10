@@ -6,9 +6,11 @@ use App\Entity\DossierVisite;
 use App\Entity\PaysDestination;
 use App\Entity\OrganismeEtranger;
 use App\Entity\ProgrammeCooperation;
+use App\Entity\CadreINS;
 use App\Controller\PaysDestinationController;
 use App\Controller\OrganismeEtrangerController;
 use App\Controller\ProgrammeCooperationController;
+use App\Controller\CadreINSController;
 use App\Repository\DossierVisiteRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -73,6 +75,8 @@ class DossierVisiteController extends AbstractController
        $pays_destination_libelle =  isset($data['pays_destination_libelle']) ? $data['pays_destination_libelle'] : null;
        $organisme_etranger_libelle =  isset($data['organisme_etranger_libelle']) ? $data['organisme_etranger_libelle'] : null; 
        $programme_libelle =  isset($data['programme_libelle']) ? $data['programme_libelle'] : null; 
+        $cadre_id = array();
+       $cadre_id =  isset($data['cadre_id']) ? $data['cadre_id'] : null;
 
         $dossiervisite->setDateArriveInvitation($date_arrive_invitation);
         $dossiervisite->setDateDebut($date_deb);
@@ -101,10 +105,18 @@ class DossierVisiteController extends AbstractController
             $organismeEtranger = $repositoryOrg->findOneBy(['libelle_org' => $organisme_etranger_libelle]);
             $repositoryProg = $this->getDoctrine()->getRepository(ProgrammeCooperation::class);
             $programmeCooperation = $repositoryProg->findOneBy(['libelle_prog' => $programme_libelle]);
-    
+            
+            $repositoryCadre = $this->getDoctrine()->getRepository(CadreINS::class);    
+            
+                   for ($i=0; $i < count($cadre_id); $i++) { 
+                    $cadreINS = $repositoryCadre->findOneBy(['id' => $cadre_id[$i]]);
+                    $dossiervisite->addParticipation($cadreINS);
+                   }
+                
                 if ($organismeEtranger && $programmeCooperation) {
                     $organismeEtranger->addOrganismeProgrammes($programmeCooperation);
                     $dossiervisite->setOrganismeEtranger($organismeEtranger);
+                    
                 }
 
             $entityManager = $this->getDoctrine()->getManager();
