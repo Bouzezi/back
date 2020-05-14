@@ -309,7 +309,7 @@ class DossierVisite
     }
 
     public function getParticipation(){
-        return $this->participation;
+        return $this->participation->toArray();
     }
 
 }

@@ -30,6 +30,7 @@ class DossierVisiteController extends AbstractController
     {
         $dossiers=$dossiervisiteRepository->findAll();
         $datas=array();
+        //$cadres=array();
         foreach ($dossiers as $key => $dossier){
             $datas[$key]['id'] = $dossier->getId();
             $datas[$key]['date_arrive_visite'] = $dossier->getDateArriveInvitation();
@@ -47,8 +48,11 @@ class DossierVisiteController extends AbstractController
             $datas[$key]['langues'] = $dossier->getLangues();
             $datas[$key]['pays_destination_id'] = $dossier->getPaysDestination()->getLibellePays();
             $datas[$key]['organisme_etranger_id'] = $dossier->getOrganismeEtranger()->getLibelleOrg();
+            $datas[$key]['organisme_etranger_id'] = $dossier->getOrganismeEtranger()->getLibelleOrg();
             $datas[$key]['annee'] = $dossier->getAnnee();
-
+            //$cadres= $dossier->getParticipation();
+            //$datas[$key]['participer']= $cadres;
+            //print_r($cadres);
         }
         return new JsonResponse($datas);
     }
@@ -139,22 +143,44 @@ class DossierVisiteController extends AbstractController
     /**
      * @Route("/{id}", name="dossiervisite_show", methods={"GET"})
      */
-    public function show(Dossiervisite $dossiervisite): Response
+    public function show($id): Response
     {
-        
-        $datas=array();
-        
-            $datas[0]['id'] = $dossiervisite->getId();
-            $datas[0]['date_arrive_visite'] = $dossiervisite->getDateArriveVisite()->format('Y/m/d');
-            $datas[0]['nature'] = $dossiervisite->getNature();
-            $datas[0]['sujet'] = $dossiervisite->getSujet();
-            $datas[0]['date_deb'] = $dossiervisite->getDateDeb()->format('Y/m/d');;
-            $datas[0]['date_fin'] = $dossiervisite->getDateFin()->format('Y/m/d');;
-            $datas[0]['date_limite_rep'] = $dossiervisite->getDateLimiteRep()->format('Y/m/d');;
-            $datas[0]['paye_destination'] = $dossiervisite->getPayeDestination();
-            $datas[0]['ville_destination'] = $dossiervisite->getVilleDestination();
-            $datas[0]['annee'] = $dossiervisite->getAnnee();
+        $dossier = $this->getDoctrine()
+        ->getRepository(DossierVisite::class)
+        ->find($id);
 
+        $datas=array();
+
+        $datas[0]['id'] = $dossier->getId();
+        $datas[0]['date_arrive_visite'] = $dossier->getDateArriveInvitation();
+        $datas[0]['nature'] = $dossier->getNature();
+        $datas[0]['sujet'] = $dossier->getSujet();
+        $datas[0]['date_deb'] = $dossier->getDateDebut();
+        $datas[0]['date_fin'] = $dossier->getDateFin();
+        $datas[0]['type_visite'] = $dossier->getTypeVisite();
+        $datas[0]['nb_participant_ins'] = $dossier->getNbrParticipantINS();
+        $datas[0]['nb_participant_sp'] = $dossier->getNbrParticipantSP();
+        $datas[0]['frais_transport'] = $dossier->getFraisTransport();
+        $datas[0]['frais_residence'] = $dossier->getFraisResidence();
+        $datas[0]['date_limite_reponce'] = $dossier->getDateLimiteReponce();
+        $datas[0]['statut'] = $dossier->getStatut();
+        $datas[0]['langues'] = $dossier->getLangues();
+        $datas[0]['pays_destination_id'] = $dossier->getPaysDestination()->getLibellePays();
+        $datas[0]['organisme_etranger_id'] = $dossier->getOrganismeEtranger()->getLibelleOrg();
+        $datas[0]['organisme_etranger_id'] = $dossier->getOrganismeEtranger()->getLibelleOrg();
+        $datas[0]['annee'] = $dossier->getAnnee(); 
+        $cadres=$dossier->getParticipation();
+        
+        $c=array();
+        foreach ($cadres as $key => $cadre){
+            $c[$key]['cadre_id']=$cadre->getId();
+            $c[$key]['cadre_nom']=$cadre->getNom();
+            $c[$key]['cadre_prenom']=$cadre->getPrenom();
+            $c[$key]['cadre_grade']=$cadre->getGrade();
+            $c[$key]['cadre_fonction']=$cadre->getFonction();
+        }
+        $datas[0]['cadre_participe']=$c;
+        //array_push($datas,$c);
         
         return new JsonResponse($datas);
     }
