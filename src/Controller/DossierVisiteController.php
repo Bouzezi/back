@@ -178,6 +178,7 @@ class DossierVisiteController extends AbstractController
             $c[$key]['cadre_prenom']=$cadre->getPrenom();
             $c[$key]['cadre_grade']=$cadre->getGrade();
             $c[$key]['cadre_fonction']=$cadre->getFonction();
+            $c[$key]['cadre_direction']=$cadre->getDirectionCentrale()->getLibelleDirection();
         }
         $datas[0]['cadre_participe']=$c;
         //array_push($datas,$c);
