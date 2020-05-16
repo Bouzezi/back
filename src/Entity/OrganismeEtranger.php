@@ -101,6 +101,6 @@ class OrganismeEtranger
     }
 
     public function getOrganismeProgrammes(){
-        return $this->organismeProgrammes;
+        return $this->organismeProgrammes->toArray();
     }
 }

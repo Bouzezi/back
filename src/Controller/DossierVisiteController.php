@@ -167,21 +167,27 @@ class DossierVisiteController extends AbstractController
         $datas[0]['langues'] = $dossier->getLangues();
         $datas[0]['pays_destination_id'] = $dossier->getPaysDestination()->getLibellePays();
         $datas[0]['organisme_etranger_id'] = $dossier->getOrganismeEtranger()->getLibelleOrg();
-        $datas[0]['organisme_etranger_id'] = $dossier->getOrganismeEtranger()->getLibelleOrg();
         $datas[0]['annee'] = $dossier->getAnnee(); 
         $cadres=$dossier->getParticipation();
+        $progs= $dossier->getOrganismeEtranger()->getOrganismeProgrammes();
         
+        $p=array();
         $c=array();
         foreach ($cadres as $key => $cadre){
-            $c[$key]['cadre_id']=$cadre->getId();
-            $c[$key]['cadre_nom']=$cadre->getNom();
-            $c[$key]['cadre_prenom']=$cadre->getPrenom();
-            $c[$key]['cadre_grade']=$cadre->getGrade();
-            $c[$key]['cadre_fonction']=$cadre->getFonction();
-            $c[$key]['cadre_direction']=$cadre->getDirectionCentrale()->getLibelleDirection();
+            $c[$key]['id']=$cadre->getId();
+            $c[$key]['nom']=$cadre->getNom();
+            $c[$key]['prenom']=$cadre->getPrenom();
+            $c[$key]['grade']=$cadre->getGrade();
+            $c[$key]['fonction']=$cadre->getFonction();
+            $c[$key]['direction']=$cadre->getDirectionCentrale()->getLibelleDirection();
         }
         $datas[0]['cadre_participe']=$c;
-        //array_push($datas,$c);
+        
+        foreach ($progs as $key => $prog){
+            $p[$key]['programme_id']=$prog->getId();
+            $p[$key]['programme_libelle']=$prog->getLibelleProg();
+        }
+        $datas[0]['programme_cooperation']=$p;
         
         return new JsonResponse($datas);
     }
