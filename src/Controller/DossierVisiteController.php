@@ -30,7 +30,6 @@ class DossierVisiteController extends AbstractController
     {
         $dossiers=$dossiervisiteRepository->findAll();
         $datas=array();
-        //$cadres=array();
         foreach ($dossiers as $key => $dossier){
             $datas[$key]['id'] = $dossier->getId();
             $datas[$key]['date_arrive_visite'] = $dossier->getDateArriveInvitation();
@@ -48,11 +47,8 @@ class DossierVisiteController extends AbstractController
             $datas[$key]['langues'] = $dossier->getLangues();
             $datas[$key]['pays_destination_id'] = $dossier->getPaysDestination()->getLibellePays();
             $datas[$key]['organisme_etranger_id'] = $dossier->getOrganismeEtranger()->getLibelleOrg();
-            $datas[$key]['organisme_etranger_id'] = $dossier->getOrganismeEtranger()->getLibelleOrg();
             $datas[$key]['annee'] = $dossier->getAnnee();
-            //$cadres= $dossier->getParticipation();
-            //$datas[$key]['participer']= $cadres;
-            //print_r($cadres);
+            
         }
         return new JsonResponse($datas);
     }
@@ -81,14 +77,17 @@ class DossierVisiteController extends AbstractController
         $frais_transport =  isset($data['frais_transport']) ? $data['frais_transport'] : null;
         $frais_residence =  isset($data['frais_residence']) ? $data['frais_residence'] : null;
         $statut	 =  isset($data['statut']) ? $data['statut'] : null;
-        $nature =  isset($data['nature']) ? $data['nature'] : null;
         $langues =  isset($data['langues']) ? $data['langues'] : null;
        $pays_destination_libelle =  isset($data['pays_destination_libelle']) ? $data['pays_destination_libelle'] : null;
        $organisme_etranger_libelle =  isset($data['organisme_etranger_libelle']) ? $data['organisme_etranger_libelle'] : null; 
-       $programme_libelle =  isset($data['programme_libelle']) ? $data['programme_libelle'] : null; 
+       $programme_libelle =  isset($data['programme_libelle']) ? $data['programme_libelle'] : null;
+       $ville =  isset($data['ville']) ? $data['ville'] : null;
+       $direction =  isset($data['direction']) ? $data['direction'] : null;
+       //$programme =  isset($data['programme']) ? $data['programme'] : null;
+       
         $cadre_id = array();
        $cadre_id =  isset($data['cadre_id']) ? $data['cadre_id'] : null;
-
+        
         $dossiervisite->setDateArriveInvitation($date_arrive_invitation);
         $dossiervisite->setDateDebut($date_deb);
         $dossiervisite->setDateFin($date_fin);
@@ -102,7 +101,12 @@ class DossierVisiteController extends AbstractController
         $dossiervisite->setFraisResidence($frais_residence);
         $dossiervisite->setStatut($statut);
         $dossiervisite->setNature($nature);
-        $dossiervisite->setLangues($langues); 
+        $dossiervisite->setLangues($langues);
+        $dossiervisite->setProgramme($programme_libelle);
+        $dossiervisite->setDirection($direction);
+        $dossiervisite->setVille($ville);
+        
+
 
         $repository = $this->getDoctrine()->getRepository(PaysDestination::class);
         $pays_destination = $repository->findOneBy(['libelle_pays' => $pays_destination_libelle]);
@@ -165,13 +169,15 @@ class DossierVisiteController extends AbstractController
         $datas[0]['date_limite_reponce'] = $dossier->getDateLimiteReponce();
         $datas[0]['statut'] = $dossier->getStatut();
         $datas[0]['langues'] = $dossier->getLangues();
+        $datas[0]['ville'] = $dossier->getVille();
+        $datas[0]['direction'] = $dossier->getDirection();
+        $datas[0]['programme_libelle'] = $dossier->getProgramme();
         $datas[0]['pays_destination_id'] = $dossier->getPaysDestination()->getLibellePays();
         $datas[0]['organisme_etranger_id'] = $dossier->getOrganismeEtranger()->getLibelleOrg();
         $datas[0]['annee'] = $dossier->getAnnee(); 
         $cadres=$dossier->getParticipation();
         $progs= $dossier->getOrganismeEtranger()->getOrganismeProgrammes();
         
-        $p=array();
         $c=array();
         foreach ($cadres as $key => $cadre){
             $c[$key]['id']=$cadre->getId();
@@ -183,11 +189,6 @@ class DossierVisiteController extends AbstractController
         }
         $datas[0]['cadre_participe']=$c;
         
-        foreach ($progs as $key => $prog){
-            $p[$key]['programme_id']=$prog->getId();
-            $p[$key]['programme_libelle']=$prog->getLibelleProg();
-        }
-        $datas[0]['programme_cooperation']=$p;
         
         return new JsonResponse($datas);
     }

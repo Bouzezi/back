@@ -107,6 +107,24 @@ class DossierVisite
      */
     private $participation;
 
+    /**
+     * @ORM\Column(type="string", length=100)
+     */
+    /**
+     * @ORM\Column(type="string", length=50)
+     */
+    private $ville;
+
+    /**
+     * @ORM\Column(type="string", length=100)
+     */
+    private $direction;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $programme;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -311,5 +329,42 @@ class DossierVisite
     public function getParticipation(){
         return $this->participation->toArray();
     }
+
+    public function getVille(): ?string
+    {
+        return $this->ville;
+    }
+
+    public function setVille(string $ville): self
+    {
+        $this->ville = $ville;
+
+        return $this;
+    }
+
+    public function getDirection(): ?string
+    {
+        return $this->direction;
+    }
+
+    public function setDirection(string $direction): self
+    {
+        $this->direction = $direction;
+
+        return $this;
+    }
+
+    public function getProgramme(): ?string
+    {
+        return $this->programme;
+    }
+
+    public function setProgramme(string $programme): self
+    {
+        $this->programme = $programme;
+
+        return $this;
+    }
+  
 
 }
