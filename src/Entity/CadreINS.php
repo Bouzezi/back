@@ -47,6 +47,13 @@ class CadreINS
         return $this->id;
     }
 
+    public function setId()
+    {
+        $this->id = null;
+
+        return $this;
+    }
+
     public function getNom(): ?string
     {
         return $this->nom;

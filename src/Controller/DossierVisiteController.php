@@ -69,7 +69,6 @@ class DossierVisiteController extends AbstractController
         $date_deb =  isset($data['date_deb']) ? $data['date_deb'] : null;
         $date_fin =  isset($data['date_fin']) ? $data['date_fin'] : null;
         $date_limite_rep =  isset($data['date_limite_reponce']) ? $data['date_limite_reponce'] : null;
-       // $ville_destination =  isset($data['ville_destination']) ? $data['ville_destination'] : null;
         $annee =  isset($data['annee']) ? $data['annee'] : null;
         $type_visite =  isset($data['type_visite']) ? $data['type_visite'] : null;
         $nbr_participant_ins =  isset($data['nbr_participant_ins']) ? $data['nbr_participant_ins'] : null;
@@ -175,7 +174,7 @@ class DossierVisiteController extends AbstractController
         $datas[0]['pays_destination_id'] = $dossier->getPaysDestination()->getLibellePays();
         $datas[0]['organisme_etranger_id'] = $dossier->getOrganismeEtranger()->getLibelleOrg();
         $datas[0]['annee'] = $dossier->getAnnee(); 
-        $cadres=$dossier->getParticipation();
+        $cadres=$dossier->getParticipation()->toArray();
         $progs= $dossier->getOrganismeEtranger()->getOrganismeProgrammes();
         
         $c=array();
@@ -194,13 +193,17 @@ class DossierVisiteController extends AbstractController
     }
 
     /**
-     * @Route("/{id}/edit", name="dossiervisite_edit", methods={"GET","PUT"})
+     * @Route("/edit/{id}", name="dossiervisite_edit", methods={"GET","PUT"})
      */
-    public function edit(Request $request, Dossiervisite $dossiervisite): Response
+    public function edit(Request $request, $id): Response
     {
-        $data = json_decode($request->getContent(),true);
+        $dossiervisite = $this->getDoctrine()
+        ->getRepository(DossierVisite::class)
+        ->find($id);
 
-        $date_arrive_visite =  isset($data['date_arrive_visite']) ? $data['date_arrive_visite'] : null;
+        $data = json_decode($request->getContent(),true);
+        //annee
+        $date_arrive_invitation =  isset($data['date_arrive_invitation']) ? $data['date_arrive_invitation'] : null;
         $nature =  isset($data['nature']) ? $data['nature'] : null;
         $sujet =  isset($data['sujet']) ? $data['sujet'] : null;
         $date_deb =  isset($data['date_deb']) ? $data['date_deb'] : null;
@@ -208,18 +211,50 @@ class DossierVisiteController extends AbstractController
         $date_limite_rep =  isset($data['date_limite_rep']) ? $data['date_limite_rep'] : null;
         $paye_destination =  isset($data['paye_destination']) ? $data['paye_destination'] : null;
         $ville_destination =  isset($data['ville_destination']) ? $data['ville_destination'] : null;
-        $annee =  isset($data['annee']) ? $data['annee'] : null;
+        $nbr_participant_ins =  isset($data['nbr_participant_ins']) ? $data['nbr_participant_ins'] : null;
+        $nbr_participant_sp =  isset($data['nbr_participant_sp']) ? $data['nbr_participant_sp'] : null;
+        $frais_transport =  isset($data['frais_transport']) ? $data['frais_transport'] : null;
+        $frais_residence =  isset($data['frais_residence']) ? $data['frais_residence'] : null;
+        $date_limite_rep =  isset($data['date_limite_reponce']) ? $data['date_limite_reponce'] : null;
+        $statut	 =  isset($data['statut']) ? $data['statut'] : null;
+        $langues =  isset($data['langues']) ? $data['langues'] : null;
+        $ville =  isset($data['ville']) ? $data['ville'] : null;
+        $direction =  isset($data['direction']) ? $data['direction'] : null;
+        $programme_libelle =  isset($data['programme_libelle']) ? $data['programme_libelle'] : null;
+        $pays_destination_libelle =  isset($data['pays_destination_libelle']) ? $data['pays_destination_libelle'] : null;
+        $organisme_etranger_libelle =  isset($data['organisme_etranger_libelle']) ? $data['organisme_etranger_libelle'] : null; 
+        $cadre_id = array();
+        $cadre_id =  isset($data['cadre_id']) ? $data['cadre_id'] : null;
+        $cadre_participe = array();
+        $cadre_participe =  isset($data['cadre_participe']) ? $data['cadre_participe'] : null;
 
         if($dossiervisite->getId() != null){
-            $dossiervisite->setDateArriveVisite(new \DateTime($date_arrive_visite));
+            $dossiervisite->setDateArriveInvitation($date_arrive_invitation);
+            $dossiervisite->setDateDebut($date_deb);
+            $dossiervisite->setDateFin($date_fin);
+            $dossiervisite->setDateLimiteReponce($date_limite_rep);
             $dossiervisite->setSujet($sujet);
+            $dossiervisite->setNbrParticipantINS($nbr_participant_ins);
+            $dossiervisite->setNbrParticipantSP($nbr_participant_sp);
+            $dossiervisite->setFraisTransport($frais_transport);
+            $dossiervisite->setFraisResidence($frais_residence);
+            $dossiervisite->setStatut($statut);
             $dossiervisite->setNature($nature);
-            $dossiervisite->setDateDeb(new \DateTime($date_deb));
-            $dossiervisite->setDateFin(new \DateTime($date_fin));
-            $dossiervisite->setDateLimiteRep(new \DateTime($date_limite_rep));
-            $dossiervisite->setPayeDestination($paye_destination);
-            $dossiervisite->setVilleDestination($ville_destination);
-            $dossiervisite->setAnnee($annee);
+            $dossiervisite->setLangues($langues);
+            $dossiervisite->setProgramme($programme_libelle);
+            $dossiervisite->setDirection($direction);
+            $dossiervisite->setVille($ville);
+            $repositoryCadre = $this->getDoctrine()->getRepository(CadreINS::class);    
+            
+                        
+                   for ($i=0; $i < count($cadre_participe); $i++) { 
+                        $cadreINS = $repositoryCadre->findOneBy(['id' => $cadre_participe[$i]]);
+                        $dossiervisite->removeParticipation($cadreINS);
+                   }
+                   for ($j=0; $j < count($cadre_id); $j++) { 
+                        $cadreINS = $repositoryCadre->findOneBy(['id' => $cadre_id[$j]]);
+                        $dossiervisite->addParticipation($cadreINS);
+                    }
 
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->persist($dossiervisite);

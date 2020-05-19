@@ -327,7 +327,15 @@ class DossierVisite
     }
 
     public function getParticipation(){
-        return $this->participation->toArray();
+        return $this->participation;
+    }
+
+    public function removeParticipation(CadreINS $cadre)
+    {
+        if (!$this->participation->contains($cadre)) {
+            return;
+        }
+        $this->participation->removeElement($cadre);
     }
 
     public function getVille(): ?string
