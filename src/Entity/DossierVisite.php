@@ -125,6 +125,12 @@ class DossierVisite
      */
     private $programme;
 
+    /**
+     * @ORM\OneToOne(targetEntity="App\Entity\Note", mappedBy="dossierVisite", cascade={"remove"})
+     */
+    private $note;
+
+
     public function getId(): ?int
     {
         return $this->id;
@@ -370,6 +376,18 @@ class DossierVisite
     public function setProgramme(string $programme): self
     {
         $this->programme = $programme;
+
+        return $this;
+    }
+
+    public function getNote(): ?Note
+    {
+        return $this->note;
+    }
+
+    public function setNote(Note $note): self
+    {
+        $this->note = $note;
 
         return $this;
     }

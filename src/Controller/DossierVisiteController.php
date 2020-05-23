@@ -136,7 +136,7 @@ class DossierVisiteController extends AbstractController
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->persist($dossiervisite);
             $entityManager->flush();    
-                
+            $data['id']  = $dossiervisite->getId();
             
             return new JsonResponse($data);
             
@@ -227,7 +227,7 @@ class DossierVisiteController extends AbstractController
         $cadre_id =  isset($data['cadre_id']) ? $data['cadre_id'] : null;
         $cadre_participe = array();
         $cadre_participe =  isset($data['cadre_participe']) ? $data['cadre_participe'] : null;
-
+        $data['id']=$id;
         if($dossiervisite->getId() != null){
             $dossiervisite->setDateArriveInvitation($date_arrive_invitation);
             $dossiervisite->setDateDebut($date_deb);
@@ -260,7 +260,7 @@ class DossierVisiteController extends AbstractController
             $entityManager->persist($dossiervisite);
             $entityManager->flush();
 
-            return new JsonResponse("updated!!");
+            return new JsonResponse($data);
         }
         
     }
