@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -129,6 +131,16 @@ class DossierVisite
      * @ORM\OneToOne(targetEntity="App\Entity\Note", mappedBy="dossierVisite", cascade={"remove"})
      */
     private $note;
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\FicheRenseignement", mappedBy="dossierVisite")
+     */
+    private $fiches;
+
+    public function __construct()
+    {
+        $this->fiches = new ArrayCollection();
+    }
 
 
     public function getId(): ?int
@@ -388,6 +400,37 @@ class DossierVisite
     public function setNote(Note $note): self
     {
         $this->note = $note;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|FicheRenseignement[]
+     */
+    public function getFiches(): Collection
+    {
+        return $this->fiches;
+    }
+
+    public function addFich(FicheRenseignement $fich): self
+    {
+        if (!$this->fiches->contains($fich)) {
+            $this->fiches[] = $fich;
+            $fich->setDossierVisite($this);
+        }
+
+        return $this;
+    }
+
+    public function removeFich(FicheRenseignement $fich): self
+    {
+        if ($this->fiches->contains($fich)) {
+            $this->fiches->removeElement($fich);
+            // set the owning side to null (unless already changed)
+            if ($fich->getDossierVisite() === $this) {
+                $fich->setDossierVisite(null);
+            }
+        }
 
         return $this;
     }
