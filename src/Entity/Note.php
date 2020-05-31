@@ -26,7 +26,7 @@ class Note
     private $description;
 
     /**
-     * @ORM\OneToOne(targetEntity="App\Entity\DossierVisite",inversedBy="note", cascade={"remove"})
+     * @ORM\OneToOne(targetEntity="App\Entity\DossierVisite",inversedBy="note")
      */
     private $dossierVisite;
 

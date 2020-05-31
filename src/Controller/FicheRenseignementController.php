@@ -59,20 +59,34 @@ class FicheRenseignementController extends AbstractController
         ->getRepository(DossierVisite::class)
         ->find($dossier_id);
 
-        $fiche->setDate($date);
-        $fiche->setAutreFrais($autre_frais);
-        $fiche->setObjectifVisite($objectif_visite);
-        $fiche->setRelationParticipantVisite($relation_participant_visite);
-        $fiche->setDerniereVisite($derniere_visite);
-        $fiche->setDateEnvoieRapport($date_envoie_rapport);
-        $fiche->setCadreINS($cadre_ins);
-        $dossier->addFich($fiche);
-        
-
-            $entityManager = $this->getDoctrine()->getManager();
+        $fiche1 = $this->getDoctrine()
+        ->getRepository(FicheRenseignement::class)
+        ->findOneBy([
+            'cadreINS' => $cadre_ins,
+            'dossierVisite' => $dossier_id,
             
+        ]);
+
+        if($fiche1 == null){
+            $fiche->setDate($date);
+            $fiche->setAutreFrais($autre_frais);
+            $fiche->setObjectifVisite($objectif_visite);
+            $fiche->setRelationParticipantVisite($relation_participant_visite);
+            $fiche->setDerniereVisite($derniere_visite);
+            $fiche->setDateEnvoieRapport($date_envoie_rapport);
+            $fiche->setCadreINS($cadre_ins);
+            $dossier->addFich($fiche);
+        
+            $entityManager = $this->getDoctrine()->getManager();  
             $entityManager->persist($fiche);
             $entityManager->flush();
+        }
+        else{
+            throw $this->createNotFoundException(
+                ' fiche renseignement duplicated '
+            );
+        }
+            
 
             return new JsonResponse($data);
             
@@ -125,7 +139,7 @@ class FicheRenseignementController extends AbstractController
         ->find($id);
         $data = json_decode($request->getContent(),true);
 
-        $date =  isset($data['date']) ? $data['date'] : null;
+        $date =  $data['date'];
         $autre_frais =  isset($data['autre_frais']) ? $data['autre_frais'] : null;
         $objectif_visite =  isset($data['objectif_visite']) ? $data['objectif_visite'] : null;
         $relation_participant_visite =  isset($data['relation_participant_visite']) ? $data['relation_participant_visite'] : null;
@@ -146,8 +160,7 @@ class FicheRenseignementController extends AbstractController
             $entityManager->flush();
             $data['id']=$id;
             return new JsonResponse($data);
-        }
-        
+        }     
     }
 
     /**

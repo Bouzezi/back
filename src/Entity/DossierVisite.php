@@ -137,6 +137,11 @@ class DossierVisite
      */
     private $fiches;
 
+    /**
+     * @ORM\OneToOne(targetEntity="App\Entity\Bordereau", mappedBy="dossierVisite", cascade={"remove"})
+     */
+    private $bordereau;
+
     public function __construct()
     {
         $this->fiches = new ArrayCollection();
@@ -430,6 +435,23 @@ class DossierVisite
             if ($fich->getDossierVisite() === $this) {
                 $fich->setDossierVisite(null);
             }
+        }
+
+        return $this;
+    }
+
+    public function getBordereau(): ?Bordereau
+    {
+        return $this->bordereau;
+    }
+
+    public function setBordereau(Bordereau $bordereau): self
+    {
+        $this->bordereau = $bordereau;
+
+        // set the owning side of the relation if necessary
+        if ($bordereau->getDossierVisite() !== $this) {
+            $bordereau->setDossierVisite($this);
         }
 
         return $this;

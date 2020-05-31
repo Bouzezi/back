@@ -55,6 +55,7 @@ class NoteController extends AbstractController
         $note->setDescription($description);
         $note->setDate($date);
         $note->setDossierVisite($dossier);
+        $dossier->setNote($note);
         
 
             $entityManager = $this->getDoctrine()->getManager();
@@ -89,7 +90,7 @@ class NoteController extends AbstractController
             $datas[0]['piece_jointe'] = $note->getPieceJointe();
             $datas[0]['description'] = $note->getDescription();
             $datas[0]['date'] = $note->getDate();
-            $datas[0]['dossier_visite_id'] = $dossier_visite_id;
+            $datas[0]['dossier_id'] = $dossier_visite_id;
         }
         
         return new JsonResponse($datas);
@@ -128,8 +129,11 @@ class NoteController extends AbstractController
     /**
      * @Route("/{id}", name="note_delete", methods={"DELETE"})
      */
-    public function delete(Note $note): Response
+    public function delete( $id): Response
     {
+        $note = $this->getDoctrine()
+        ->getRepository(Note::class)
+        ->find($id);
         
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->remove($note);
