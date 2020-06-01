@@ -61,31 +61,30 @@ class CadreINSController extends AbstractController
      * @Route("/new", name="cadreINS_new", methods={"POST"})
      */
     public function new(Request $request): Response
-    { 
-        $cadre = new CadreINS();
+    {   $cadre = new CadreINS();
         $data = json_decode($request->getContent(),true);
         
         $nom =  isset($data['nom']) ? $data['nom'] : null;
         $prenom =  isset($data['prenom']) ? $data['prenom'] : null;
         $grade =  isset($data['grade']) ? $data['grade'] : null;
         $fonction =  isset($data['fonction']) ? $data['fonction'] : null;
-        $direction_id =  isset($data['direction_id']) ? $data['direction_id'] : null;
+        $direction_centrale_id= isset($data['direction']) ? $data['direction'] : null;
+       
+           $direction=$this->getDoctrine()->getRepository(DirectionCentrale::class)
+           ->findOneBy(['libelle_direction' => $direction_centrale_id]);
 
-        $direction = $this->getDoctrine()
-        ->getRepository(DirectionCentrale::class)
-        ->find($direction_id);
-     
+
         $cadre->setNom($nom);
         $cadre->setPrenom($prenom);
-        $cadre->setGrade($grade); 
+        $cadre->setGrade($grade);
         $cadre->setFonction($fonction);
         $cadre->setDirectionCentrale($direction);
-
-            $entityManager = $this->getDoctrine()->getManager();  
+            $entityManager = $this->getDoctrine()->getManager();
             $entityManager->persist($cadre);
             $entityManager->flush();
+
+            return new JsonResponse($data);
             
-            return new JsonResponse($data);       
     }
 
     /**
@@ -116,9 +115,9 @@ class CadreINSController extends AbstractController
     }
 
     /**
-     * @Route("/edit/{id}", name="cadreINS_edit", methods={"PUT"})
+     * @Route("/{id}/edit", name="cadreINS_edit", methods={"GET","PUT"})
      */
-    public function edit(Request $request,  $id): Response
+    public function edit(Request $request, CadreINS $cadreINS): Response
     {
         $data = json_decode($request->getContent(),true);
 
@@ -126,9 +125,7 @@ class CadreINSController extends AbstractController
         $prenom =  isset($data['prenom']) ? $data['prenom'] : null;
         $grade =  isset($data['grade']) ? $data['grade'] : null;
         $fonction =  isset($data['fonction']) ? $data['fonction'] : null;
-        $cadreINS = $this->getDoctrine()
-        ->getRepository(CadreINS::class)
-        ->find($id);
+
         if($cadreINS->getId() != null){
             
             $cadreINS->setNom($nom);
@@ -139,13 +136,14 @@ class CadreINSController extends AbstractController
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->persist($cadreINS);
             $entityManager->flush();
-            $data['id']=$id;
-            return new JsonResponse($data);
+
+            return new JsonResponse("updated!!");
         }
         
     }
 
-    /**
+    
+/**
      * @Route("/{id}", name="cadreINS_delete", methods={"DELETE"})
      */
     public function delete($id): Response
