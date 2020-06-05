@@ -51,6 +51,7 @@ class CadreINSController extends AbstractController
                 $datas[$key]['prenom'] = $cadre->getPrenom();
                 $datas[$key]['grade'] = $cadre->getGrade();
                 $datas[$key]['fonction'] = $cadre->getFonction();
+               
             }
             
         }
@@ -110,28 +111,35 @@ class CadreINSController extends AbstractController
             $datas[0]['prenom'] = $cadre->getPrenom();
             $datas[0]['grade'] = $cadre->getGrade();
             $datas[0]['fonction'] = $cadre->getFonction();
+            $datas[0]['direction'] = $cadre->getDirectionCentrale()->getLibelleDirection();
         }
         return new JsonResponse($datas);
     }
 
     /**
-     * @Route("/{id}/edit", name="cadreINS_edit", methods={"GET","PUT"})
+     * @Route("/edit/{id}", name="cadreINS_edit", methods={"GET","PUT"})
      */
-    public function edit(Request $request, CadreINS $cadreINS): Response
+    public function edit(Request $request, $id): Response
     {
         $data = json_decode($request->getContent(),true);
-
+        $cadreINS = $this->getDoctrine()
+        ->getRepository(CadreINS::class)
+        ->find($id);
         $nom =  isset($data['nom']) ? $data['nom'] : null;
         $prenom =  isset($data['prenom']) ? $data['prenom'] : null;
         $grade =  isset($data['grade']) ? $data['grade'] : null;
         $fonction =  isset($data['fonction']) ? $data['fonction'] : null;
-
+        $direction_centrale_id= isset($data['direction']) ? $data['direction'] : null;
+        $direction=$this->getDoctrine()->getRepository(DirectionCentrale::class)
+           ->findOneBy(['libelle_direction' => $direction_centrale_id]);
+           
         if($cadreINS->getId() != null){
             
             $cadreINS->setNom($nom);
             $cadreINS->setPrenom($prenom);
             $cadreINS->setGrade($grade);
             $cadreINS->setFonction($fonction);
+            $cadreINS->setDirectionCentrale($direction);
 
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->persist($cadreINS);

@@ -6,12 +6,14 @@ use App\Entity\DossierVisite;
 use App\Entity\PaysDestination;
 use App\Entity\OrganismeEtranger;
 use App\Entity\ProgrammeCooperation;
+use App\Entity\FicheRenseignement;
 use App\Entity\CadreINS;
 use App\Controller\PaysDestinationController;
 use App\Controller\OrganismeEtrangerController;
 use App\Controller\ProgrammeCooperationController;
 use App\Controller\CadreINSController;
 use App\Repository\DossierVisiteRepository;
+use App\Repository\FicheRenseignementRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -48,6 +50,55 @@ class DossierVisiteController extends AbstractController
             $datas[$key]['pays_destination_id'] = $dossier->getPaysDestination()->getLibellePays();
             $datas[$key]['organisme_etranger_id'] = $dossier->getOrganismeEtranger()->getLibelleOrg();
             $datas[$key]['annee'] = $dossier->getAnnee();
+            
+        }
+        return new JsonResponse($datas);
+    }
+
+    /**
+     * @Route("/suivi", name="suivi", methods={"GET"})
+     */
+    public function suivi(DossierVisiteRepository $dossiervisiteRepository): JsonResponse
+    {
+        $dossiers=$dossiervisiteRepository->findAll();
+        $datas=array();
+        $cadres=array();
+        foreach ($dossiers as $key => $dossier){
+            $datas[$key]['id_dossier'] = $dossier->getId();
+            $datas[$key]['date_arrive_visite'] = $dossier->getDateArriveInvitation();
+            $datas[$key]['nature'] = $dossier->getNature();
+            $datas[$key]['sujet'] = $dossier->getSujet();
+            $datas[$key]['date_deb'] = $dossier->getDateDebut();
+            $datas[$key]['date_fin'] = $dossier->getDateFin();
+            $datas[$key]['type_visite'] = $dossier->getTypeVisite();
+            $datas[$key]['frais_transport'] = $dossier->getFraisTransport();
+            $datas[$key]['frais_residence'] = $dossier->getFraisResidence();
+            $datas[$key]['pays_destination_lib'] = $dossier->getPaysDestination()->getLibellePays();
+            $datas[$key]['ville'] = $dossier->getVille();
+            $datas[$key]['organisme_etranger_lib'] = $dossier->getOrganismeEtranger()->getLibelleOrg();
+            
+            $cadres=$dossier->getParticipation()->toArray();        
+            $c=array();
+            foreach ($cadres as $key1 => $cadre){
+                $c[$key1]['id_cadre']=$cadre->getId();
+                $c[$key1]['nom']=$cadre->getNom();
+                $c[$key1]['prenom']=$cadre->getPrenom();
+                $c[$key1]['grade']=$cadre->getGrade();
+                $c[$key1]['fonction']=$cadre->getFonction();
+                $c[$key1]['direction']=$cadre->getDirectionCentrale()->getLibelleDirection();
+                $fiche = $this->getDoctrine()
+                ->getRepository(FicheRenseignement::class)
+                ->findOneBy([
+                    'cadreINS' => $cadre->getId(),
+                    'dossierVisite' => $dossier
+                ]);
+                if($fiche != null)
+                $datas[$key]['objectif_visite'] = $fiche->getObjectifVisite();   
+            }
+            $datas[$key]['cadre_participe']=$c;
+            
+            
+            
             
         }
         return new JsonResponse($datas);
