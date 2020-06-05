@@ -19,7 +19,7 @@ class DossierVisite
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=10)
+     * @ORM\Column(type="string", length=10, nullable=true)
      */
     private $date_arrive_invitation;
 
@@ -141,6 +141,16 @@ class DossierVisite
      * @ORM\OneToOne(targetEntity="App\Entity\Bordereau", mappedBy="dossierVisite", cascade={"remove"})
      */
     private $bordereau;
+
+    /**
+     * @ORM\Column(type="string", length=10)
+     */
+    private $date;
+
+    /**
+     * @ORM\Column(type="string", length=10, nullable=true)
+     */
+    private $date_envoi_documents;
 
     public function __construct()
     {
@@ -453,6 +463,30 @@ class DossierVisite
         if ($bordereau->getDossierVisite() !== $this) {
             $bordereau->setDossierVisite($this);
         }
+
+        return $this;
+    }
+
+    public function getDate(): ?string
+    {
+        return $this->date;
+    }
+
+    public function setDate(string $date): self
+    {
+        $this->date = $date;
+
+        return $this;
+    }
+
+    public function getDateEnvoiDocuments(): ?string
+    {
+        return $this->date_envoi_documents;
+    }
+
+    public function setDateEnvoiDocuments(?string $date_envoi_documents): self
+    {
+        $this->date_envoi_documents = $date_envoi_documents;
 
         return $this;
     }

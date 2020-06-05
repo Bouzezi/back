@@ -50,6 +50,8 @@ class DossierVisiteController extends AbstractController
             $datas[$key]['pays_destination_id'] = $dossier->getPaysDestination()->getLibellePays();
             $datas[$key]['organisme_etranger_id'] = $dossier->getOrganismeEtranger()->getLibelleOrg();
             $datas[$key]['annee'] = $dossier->getAnnee();
+            $datas[$key]['date'] = $dossier->getDate();
+            $datas[$key]['date_envoi_documents'] = $dossier->getDateEnvoiDocuments();
             
         }
         return new JsonResponse($datas);
@@ -76,7 +78,7 @@ class DossierVisiteController extends AbstractController
             $datas[$key]['pays_destination_lib'] = $dossier->getPaysDestination()->getLibellePays();
             $datas[$key]['ville'] = $dossier->getVille();
             $datas[$key]['organisme_etranger_lib'] = $dossier->getOrganismeEtranger()->getLibelleOrg();
-            
+            $datas[$key]['date_envoi_documents'] = $dossier->getDateEnvoiDocuments();
             $cadres=$dossier->getParticipation()->toArray();        
             $c=array();
             foreach ($cadres as $key1 => $cadre){
@@ -92,8 +94,11 @@ class DossierVisiteController extends AbstractController
                     'cadreINS' => $cadre->getId(),
                     'dossierVisite' => $dossier
                 ]);
-                if($fiche != null)
-                $datas[$key]['objectif_visite'] = $fiche->getObjectifVisite();   
+                if($fiche != null){
+                    $datas[$key]['objectif_visite'] = $fiche->getObjectifVisite(); 
+                    $datas[$key]['date_envoie_rapport'] = $fiche->getDateEnvoieRapport();
+                }
+                
             }
             $datas[$key]['cadre_participe']=$c;
             
@@ -133,7 +138,8 @@ class DossierVisiteController extends AbstractController
        $programme_libelle =  isset($data['programme_libelle']) ? $data['programme_libelle'] : null;
        $ville =  isset($data['ville']) ? $data['ville'] : null;
        $direction =  isset($data['direction']) ? $data['direction'] : null;
-       //$programme =  isset($data['programme']) ? $data['programme'] : null;
+       $date =  isset($data['date']) ? $data['date'] : null;
+       $date_envoi_documents =  isset($data['date_envoi_documents']) ? $data['date_envoi_documents'] : null;
        
         $cadre_id = array();
        $cadre_id =  isset($data['cadre_id']) ? $data['cadre_id'] : null;
@@ -155,6 +161,9 @@ class DossierVisiteController extends AbstractController
         $dossiervisite->setProgramme($programme_libelle);
         $dossiervisite->setDirection($direction);
         $dossiervisite->setVille($ville);
+        $dossiervisite->setDate($date);
+        $dossiervisite->setDateEnvoiDocuments($date_envoi_documents);
+
         
 
 
@@ -225,6 +234,8 @@ class DossierVisiteController extends AbstractController
         $datas[0]['pays_destination_id'] = $dossier->getPaysDestination()->getLibellePays();
         $datas[0]['organisme_etranger_id'] = $dossier->getOrganismeEtranger()->getLibelleOrg();
         $datas[0]['annee'] = $dossier->getAnnee(); 
+        $datas[0]['date'] = $dossier->getDate();
+        $datas[0]['date_envoi_documents'] = $dossier->getDateEnvoiDocuments();
         $cadres=$dossier->getParticipation()->toArray();
         $progs= $dossier->getOrganismeEtranger()->getOrganismeProgrammes();
         
@@ -274,6 +285,8 @@ class DossierVisiteController extends AbstractController
         $programme_libelle =  isset($data['programme_libelle']) ? $data['programme_libelle'] : null;
         $pays_destination_libelle =  isset($data['pays_destination_libelle']) ? $data['pays_destination_libelle'] : null;
         $organisme_etranger_libelle =  isset($data['organisme_etranger_libelle']) ? $data['organisme_etranger_libelle'] : null; 
+        $date =  isset($data['date']) ? $data['date'] : null;
+        $date_envoi_documents =  isset($data['date_envoi_documents']) ? $data['date_envoi_documents'] : null;
         $cadre_id = array();
         $cadre_id =  isset($data['cadre_id']) ? $data['cadre_id'] : null;
         $cadre_participe = array();
@@ -295,6 +308,8 @@ class DossierVisiteController extends AbstractController
             $dossiervisite->setProgramme($programme_libelle);
             $dossiervisite->setDirection($direction);
             $dossiervisite->setVille($ville);
+            $dossiervisite->setDate($date);
+            $dossiervisite->setDateEnvoiDocuments($date_envoi_documents);
             $repositoryCadre = $this->getDoctrine()->getRepository(CadreINS::class);    
             
                         
