@@ -18,7 +18,7 @@ class UploadController extends AbstractController
     public function upload(Request $request)
     {
 	    $file=$request->files->get('file');
-	    $extension_autorisees =['pdf', 'jpeg','png','docx'];
+	    $extension_autorisees =['rar','zip'];
             $filename=$file->getClientOriginalName();
           //  $fileName = md5(uniqid()).'.'.$file->guessExtension(); 
         if(in_array($file->guessExtension() ,$extension_autorisees)){
@@ -28,7 +28,7 @@ class UploadController extends AbstractController
         else
         {
             throw $this->createNotFoundException(
-                'mauvais fichier'
+                'False Extension'
             );
         }
         
