@@ -42,6 +42,11 @@ class CadreINS
      */
     private $directionCentrale;
 
+    /**
+     * @ORM\OneToMany(targetEntity="Participation", mappedBy="cadre")
+     */
+    private $participationCadre;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -113,4 +118,5 @@ class CadreINS
 
         return $this;
     }
+    
 }

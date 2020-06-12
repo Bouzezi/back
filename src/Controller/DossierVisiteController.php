@@ -3,6 +3,8 @@
 namespace App\Controller;
 
 use App\Entity\DossierVisite;
+use App\Entity\Participation;
+use App\Repository\ParticipationRepository;
 use App\Entity\PaysDestination;
 use App\Entity\OrganismeEtranger;
 use App\Entity\ProgrammeCooperation;
@@ -49,7 +51,6 @@ class DossierVisiteController extends AbstractController
             $datas[$key]['langues'] = $dossier->getLangues();
             $datas[$key]['pays_destination_id'] = $dossier->getPaysDestination()->getLibellePays();
             $datas[$key]['organisme_etranger_id'] = $dossier->getOrganismeEtranger()->getLibelleOrg();
-            $datas[$key]['annee'] = $dossier->getAnnee();
             $datas[$key]['date'] = $dossier->getDate();
             $datas[$key]['date_envoi_documents'] = $dossier->getDateEnvoiDocuments();
             
@@ -60,7 +61,7 @@ class DossierVisiteController extends AbstractController
     /**
      * @Route("/suivi", name="suivi", methods={"GET"})
      */
-    public function suivi(DossierVisiteRepository $dossiervisiteRepository): JsonResponse
+    public function suivi(DossierVisiteRepository $dossiervisiteRepository,ParticipationRepository $participationRepository): JsonResponse
     {
         $dossiers=$dossiervisiteRepository->findAll();
         $datas=array();
@@ -79,7 +80,13 @@ class DossierVisiteController extends AbstractController
             $datas[$key]['ville'] = $dossier->getVille();
             $datas[$key]['organisme_etranger_lib'] = $dossier->getOrganismeEtranger()->getLibelleOrg();
             $datas[$key]['date_envoi_documents'] = $dossier->getDateEnvoiDocuments();
-            $cadres=$dossier->getParticipation()->toArray();        
+            $cadres=array();
+            $participations=$participationRepository->findAll();
+            $i=0;
+            foreach ($participations as $key => $participe){
+                $cadres[$i]=$participe->getCadre();
+                $i++;
+            }
             $c=array();
             foreach ($cadres as $key1 => $cadre){
                 $c[$key1]['id_cadre']=$cadre->getId();
@@ -125,7 +132,6 @@ class DossierVisiteController extends AbstractController
         $date_deb =  isset($data['date_deb']) ? $data['date_deb'] : null;
         $date_fin =  isset($data['date_fin']) ? $data['date_fin'] : null;
         $date_limite_rep =  isset($data['date_limite_reponce']) ? $data['date_limite_reponce'] : null;
-        $annee =  isset($data['annee']) ? $data['annee'] : null;
         $type_visite =  isset($data['type_visite']) ? $data['type_visite'] : null;
         $nbr_participant_ins =  isset($data['nbr_participant_ins']) ? $data['nbr_participant_ins'] : null;
         $nbr_participant_sp =  isset($data['nbr_participant_sp']) ? $data['nbr_participant_sp'] : null;
@@ -149,7 +155,6 @@ class DossierVisiteController extends AbstractController
         $dossiervisite->setDateFin($date_fin);
         $dossiervisite->setDateLimiteReponce($date_limite_rep);
         $dossiervisite->setSujet($sujet);
-        $dossiervisite->setAnnee($annee);
         $dossiervisite->setTypeVisite($type_visite);
         $dossiervisite->setNbrParticipantINS($nbr_participant_ins);
         $dossiervisite->setNbrParticipantSP($nbr_participant_sp);
@@ -179,24 +184,29 @@ class DossierVisiteController extends AbstractController
             $organismeEtranger = $repositoryOrg->findOneBy(['libelle_org' => $organisme_etranger_libelle]);
             $repositoryProg = $this->getDoctrine()->getRepository(ProgrammeCooperation::class);
             $programmeCooperation = $repositoryProg->findOneBy(['libelle_prog' => $programme_libelle]);
-            
-            $repositoryCadre = $this->getDoctrine()->getRepository(CadreINS::class);    
-            
-                   for ($i=0; $i < count($cadre_id); $i++) { 
-                    $cadreINS = $repositoryCadre->findOneBy(['id' => $cadre_id[$i]]);
-                    $dossiervisite->addParticipation($cadreINS);
-                   }
-                
+               
                 if ($organismeEtranger && $programmeCooperation) {
                     $organismeEtranger->addOrganismeProgrammes($programmeCooperation);
                     $dossiervisite->setOrganismeEtranger($organismeEtranger);
                     
                 }
 
-            $entityManager = $this->getDoctrine()->getManager();
+            $repositoryCadre = $this->getDoctrine()->getRepository(CadreINS::class); 
+            $entityManager = $this->getDoctrine()->getManager(); 
             $entityManager->persist($dossiervisite);
             $entityManager->flush();    
             $data['id']  = $dossiervisite->getId();
+
+            for ($i=0; $i < count($cadre_id); $i++) { 
+                $participation=new Participation();  
+                $cadreINS = $repositoryCadre->findOneBy(['id' => $cadre_id[$i]]);
+                
+                $participation->setDossier($dossiervisite);
+                $participation->setCadre($cadreINS);
+                $participation->setAnnee($annee);
+                $entityManager->persist($participation);
+                $entityManager->flush();   
+               }
             
             return new JsonResponse($data);
             
@@ -206,7 +216,7 @@ class DossierVisiteController extends AbstractController
     /**
      * @Route("/{id}", name="dossiervisite_show", methods={"GET"})
      */
-    public function show($id): Response
+    public function show($id,ParticipationRepository $participationRepository): Response
     {
         $dossier = $this->getDoctrine()
         ->getRepository(DossierVisite::class)
@@ -233,10 +243,15 @@ class DossierVisiteController extends AbstractController
         $datas[0]['programme_libelle'] = $dossier->getProgramme();
         $datas[0]['pays_destination_id'] = $dossier->getPaysDestination()->getLibellePays();
         $datas[0]['organisme_etranger_id'] = $dossier->getOrganismeEtranger()->getLibelleOrg();
-        $datas[0]['annee'] = $dossier->getAnnee(); 
         $datas[0]['date'] = $dossier->getDate();
         $datas[0]['date_envoi_documents'] = $dossier->getDateEnvoiDocuments();
-        $cadres=$dossier->getParticipation()->toArray();
+        $cadres=array();
+        $participations=$participationRepository->findAll();
+        $i=0;
+        foreach ($participations as $key => $participe){
+            $cadres[$i]=$participe->getCadre();
+            $i++;
+        }
         $progs= $dossier->getOrganismeEtranger()->getOrganismeProgrammes();
         
         $c=array();
@@ -264,7 +279,7 @@ class DossierVisiteController extends AbstractController
         ->find($id);
 
         $data = json_decode($request->getContent(),true);
-        //annee
+        $annee =  isset($data['annee']) ? $data['annee'] : null;
         $date_arrive_invitation =  isset($data['date_arrive_invitation']) ? $data['date_arrive_invitation'] : null;
         $nature =  isset($data['nature']) ? $data['nature'] : null;
         $sujet =  isset($data['sujet']) ? $data['sujet'] : null;
@@ -311,18 +326,29 @@ class DossierVisiteController extends AbstractController
             $dossiervisite->setDate($date);
             $dossiervisite->setDateEnvoiDocuments($date_envoi_documents);
             $repositoryCadre = $this->getDoctrine()->getRepository(CadreINS::class);    
-            
+            $entityManager = $this->getDoctrine()->getManager();
                         
                    for ($i=0; $i < count($cadre_participe); $i++) { 
                         $cadreINS = $repositoryCadre->findOneBy(['id' => $cadre_participe[$i]]);
-                        $dossiervisite->removeParticipation($cadreINS);
+                        $participation = $this->getDoctrine()
+                        ->getRepository(Participation::class)
+                        ->findOneBy([
+                            'cadre' => $cadreINS->getId(),
+                            'dossier' => $dossiervisite
+                        ]);
+                        $entityManager->remove($participation);
+                        $entityManager->flush(); 
                    }
                    for ($j=0; $j < count($cadre_id); $j++) { 
                         $cadreINS = $repositoryCadre->findOneBy(['id' => $cadre_id[$j]]);
-                        $dossiervisite->addParticipation($cadreINS);
+                        $participation=new Participation();  
+                        $participation->setDossier($dossiervisite);
+                        $participation->setCadre($cadreINS);
+                        $participation->setAnnee($annee);
+                        $entityManager->persist($participation);
+                        $entityManager->flush();
                     }
 
-            $entityManager = $this->getDoctrine()->getManager();
             $entityManager->persist($dossiervisite);
             $entityManager->flush();
 
@@ -332,9 +358,9 @@ class DossierVisiteController extends AbstractController
     }
 
     /**
-     * @Route("/{id}", name="dossiervisite_delete", methods={"DELETE"})
+     * @Route("/updateStatut", name="dossiervisite_statut", methods={"PUT"})
      */
-    public function delete(Dossiervisite $dossiervisite): Response
+    public function updateStatut(Dossiervisite $dossiervisite): Response
     {
         
             $entityManager = $this->getDoctrine()->getManager();

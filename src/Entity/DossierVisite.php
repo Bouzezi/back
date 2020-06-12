@@ -44,11 +44,6 @@ class DossierVisite
     private $sujet;
 
     /**
-     * @ORM\Column(type="integer")
-     */
-    private $annee;
-
-    /**
      * @ORM\Column(type="string", length=9)
      */
     private $type_visite;
@@ -101,17 +96,10 @@ class DossierVisite
     private $organismeEtranger;
 
     /**
-     * @ORM\ManyToMany(targetEntity="CadreINS")
-     * @ORM\JoinTable(name="Participation",
-     *      joinColumns={@ORM\JoinColumn(name="visite_id", referencedColumnName="id")},
-     *      inverseJoinColumns={@ORM\JoinColumn(name="cadre_id", referencedColumnName="id")}
-     *      )
+     * @ORM\OneToMany(targetEntity="Participation", mappedBy="dossier")
      */
-    private $participation;
+    private $participationDossier;
 
-    /**
-     * @ORM\Column(type="string", length=100)
-     */
     /**
      * @ORM\Column(type="string", length=50)
      */
@@ -219,18 +207,6 @@ class DossierVisite
     public function setSujet(string $sujet): self
     {
         $this->sujet = $sujet;
-
-        return $this;
-    }
-
-    public function getAnnee(): ?int
-    {
-        return $this->annee;
-    }
-
-    public function setAnnee(int $annee): self
-    {
-        $this->annee = $annee;
 
         return $this;
     }
@@ -353,22 +329,6 @@ class DossierVisite
         $this->organismeEtranger = $organismeEtranger;
 
         return $this;
-    }
-
-    public function addParticipation(CadreINS $cadre){
-        $this->participation[] = $cadre;
-    }
-
-    public function getParticipation(){
-        return $this->participation;
-    }
-
-    public function removeParticipation(CadreINS $cadre)
-    {
-        if (!$this->participation->contains($cadre)) {
-            return;
-        }
-        $this->participation->removeElement($cadre);
     }
 
     public function getVille(): ?string
