@@ -21,7 +21,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use \Datetime;
 /**
  * @Route("/dossiervisite")
  */
@@ -87,6 +86,7 @@ class DossierVisiteController extends AbstractController
                 $cadres[$i]=$participe->getCadre();
                 $i++;
             }
+            
             $c=array();
             foreach ($cadres as $key1 => $cadre){
                 $c[$key1]['id_cadre']=$cadre->getId();
@@ -203,7 +203,7 @@ class DossierVisiteController extends AbstractController
                 
                 $participation->setDossier($dossiervisite);
                 $participation->setCadre($cadreINS);
-                $participation->setAnnee($annee);
+                $participation->setAnnee($annee);///// annee
                 $entityManager->persist($participation);
                 $entityManager->flush();   
                }

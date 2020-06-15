@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -46,6 +48,16 @@ class CadreINS
      * @ORM\OneToMany(targetEntity="Participation", mappedBy="cadre")
      */
     private $participationCadre;
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Rapport", mappedBy="cadre")
+     */
+    private $rapports;
+
+    public function __construct()
+    {
+        $this->rapports = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -115,6 +127,37 @@ class CadreINS
     public function setDirectionCentrale(?DirectionCentrale $directionCentrale): self
     {
         $this->directionCentrale = $directionCentrale;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Rapport[]
+     */
+    public function getRapports(): Collection
+    {
+        return $this->rapports;
+    }
+
+    public function addRapport(Rapport $rapport): self
+    {
+        if (!$this->rapports->contains($rapport)) {
+            $this->rapports[] = $rapport;
+            $rapport->setCadre($this);
+        }
+
+        return $this;
+    }
+
+    public function removeRapport(Rapport $rapport): self
+    {
+        if ($this->rapports->contains($rapport)) {
+            $this->rapports->removeElement($rapport);
+            // set the owning side to null (unless already changed)
+            if ($rapport->getCadre() === $this) {
+                $rapport->setCadre(null);
+            }
+        }
 
         return $this;
     }
