@@ -20,35 +20,6 @@ class ParticipationRepository extends ServiceEntityRepository
         parent::__construct($registry, Participation::class);
     }
 
-    // /**
-    //  * @return Participation[] Returns an array of Participation objects
-    //  */
-    /*
-    public function findByExampleField($value)
-    {
-        return $this->createQueryBuilder('p')
-            ->andWhere('p.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('p.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
-        ;
-    }
-    */
-
-    /*
-    public function findOneBySomeField($value): ?Participation
-    {
-        return $this->createQueryBuilder('p')
-            ->andWhere('p.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
-    }
-    */
-
     /**
      * @return CadreINS[]
      */
@@ -69,7 +40,6 @@ class ParticipationRepository extends ServiceEntityRepository
         // returns an array of Cadre objects
         return $query->getResult();
     }
-
     public function findAllAnnee(): array
     {
         $entityManager = $this->getEntityManager();
@@ -77,10 +47,11 @@ class ParticipationRepository extends ServiceEntityRepository
         $query = $entityManager->createQuery(
             'SELECT p.annee
             FROM App\Entity\Participation p
-            GROUP BY p.annee'
+            GROUP BY p.annee
+            ORDER BY p.annee DESC'
         );
 
-        // returns an array of Cadre objects
+        // returns an array of annee objects
         return $query->getResult();
     }
    
@@ -99,35 +70,20 @@ class ParticipationRepository extends ServiceEntityRepository
 
         return $stmt->fetchAll();
     }
-
-    public function findDossier($annee,$cadre): array
+    public function statParOrganisme($annee,$cadre,$dossier): array
     {
         $conn = $this->getEntityManager()->getConnection();
 
         $sql = '
-            SELECT p.dossier_id FROM participation p , dossier_visite d , cadre_ins c
+            SELECT COUNT(p.dossier_id) as nombreDossier  FROM participation p , dossier_visite d , cadre_ins c
             WHERE p.cadre_id = c.id AND p.dossier_id = d.id
-            AND p.cadre_id = :cad AND p.annee = :an
+            AND p.cadre_id = :cad AND p.annee = :an AND p.dossier_id = :dos
             ';
         $stmt = $conn->prepare($sql);
-        $stmt->execute(['cad' => $cadre , 'an' => $annee]);
+        $stmt->execute(['cad' => $cadre , 'an' => $annee, 'dos' => $dossier]);
 
         return $stmt->fetchAll();
     }
 
-    public function findAllDossier($organime): array
-    {
-        $conn = $this->getEntityManager()->getConnection();
-
-        $sql = '
-            SELECT p.dossier_id FROM participation p , dossier_visite d , cadre_ins c
-            WHERE p.cadre_id = c.id AND p.dossier_id = d.id
-            AND p.cadre_id = :cad AND p.annee = :an
-            ';
-        $stmt = $conn->prepare($sql);
-        $stmt->execute(['cad' => $cadre , 'an' => $annee]);
-
-        return $stmt->fetchAll();
-    }
-
+   
 }

@@ -48,13 +48,26 @@ class ParticipationController extends AbstractController
         $cadres=$participationRepository->findAllCadreParticipe();
          $annee=$participationRepository->findAllAnnee();
         $tab=array();
+        $t=array();
         foreach ($cadres as $key => $cad){
-            $tab[$key]=$cad;
+            $cadre= $this->getDoctrine()
+                        ->getRepository(CadreINS::class)
+                        ->findOneBy([
+                            'id' => $cad['id']
+                        ]);
+            
+                  $nom=$cadre->getNom();
+                  $prenom=$cadre->getPrenom();   
+            $tab[$key]['np']="".$nom." ".$prenom;
+            $t['np']="".$nom." ".$prenom;
+
             foreach ($annee as $key1 => $an){
                 $nb=$participationRepository->cadreParAnnee($an['annee'],$cad['id']);
-                $tab[$key][$an['annee']]=$nb[0];
+                $tab[$key][$an['annee']]=$nb[0]['nombreDossier'];
             }
         } 
+        $tab['annee']=$annee;
+        
         return new JsonResponse($tab);           
     }
     /**
@@ -68,12 +81,14 @@ class ParticipationController extends AbstractController
          $annee=$participationRepository->findAllAnnee();
         $tab=array();
         foreach ($cadres as $key => $cad){
-            $tab[$key]=$cad;
             $cadre= $this->getDoctrine()
                         ->getRepository(CadreINS::class)
                         ->findOneBy([
                             'id' => $cad['id']
                         ]);
+                $nom=$cadre->getNom();
+                $prenom=$cadre->getPrenom();   
+            $tab[$key]['np']="".$nom." ".$prenom;
             foreach ($annee as $key1 => $an){
                 $participation = $this->getDoctrine()
                         ->getRepository(Participation::class)
@@ -82,19 +97,25 @@ class ParticipationController extends AbstractController
                             'cadre' => $cadre
                         ]);
                         if($participation != null){
+                            $dossier_id=$participation->getDossier()->getId();
                             $libOragnisme=$participation->getDossier()->getOrganismeEtranger()->getLibelleOrg();
                             if($libOragnisme == $organismeLib){
-                                $nb=$participationRepository->cadreParAnnee($an['annee'],$cad['id']);
-                                $tab[$key][$an['annee']]=$nb[0];
-                            } 
+                                $nb=$participationRepository->statParOrganisme($an['annee'],$cad['id'],$dossier_id);
+                                $tab[$key][$an['annee']]=$nb[0]['nombreDossier'];
+                            }
+                            else
+                            $tab[$key][$an['annee']]=0;
+
                         }
+                        else
+                        $tab[$key][$an['annee']]=0;
             }
         } 
         return new JsonResponse($tab);           
     }
 
     /**
-     * @Route("/statParDirection", name="stat2", methods={"POST","GET"})
+     * @Route("/statParDirection", name="stat3", methods={"POST","GET"})
      */
     public function statParDirection(Request $request,ParticipationRepository $participationRepository): JsonResponse
     {
@@ -104,7 +125,6 @@ class ParticipationController extends AbstractController
          $annee=$participationRepository->findAllAnnee();
         $tab=array();
         foreach ($cadres as $key => $cad){
-            $tab[$key]=$cad;
             $cadre= $this->getDoctrine()
                         ->getRepository(CadreINS::class)
                         ->findOneBy([
@@ -115,8 +135,11 @@ class ParticipationController extends AbstractController
                 
                         if($Libdirection != null){
                             if($directionLib == $Libdirection){
-                                $nb=$participationRepository->cadreParAnnee($an['annee'],$cad['id']);
-                                $tab[$key][$an['annee']]=$nb[0];
+                                $nom=$cadre->getNom();
+                                $prenom=$cadre->getPrenom();   
+                                $tab[$key]['np']="".$nom." ".$prenom;
+                                $nb=$participationRepository->cadreParAnnee($an['annee'],$cadre->getId());
+                                $tab[$key][$an['annee']]=$nb[0]['nombreDossier'];
                             } 
                         }
             }
