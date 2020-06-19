@@ -92,19 +92,21 @@ class ParticipationController extends AbstractController
             foreach ($annee as $key1 => $an){
                 $participation = $this->getDoctrine()
                         ->getRepository(Participation::class)
-                        ->findOneBy([
+                        ->findBy([
                             'annee' => $an['annee'],
                             'cadre' => $cadre
                         ]);
                         if($participation != null){
-                            $dossier_id=$participation->getDossier()->getId();
-                            $libOragnisme=$participation->getDossier()->getOrganismeEtranger()->getLibelleOrg();
-                            if($libOragnisme == $organismeLib){
-                                $nb=$participationRepository->statParOrganisme($an['annee'],$cad['id'],$dossier_id);
-                                $tab[$key][$an['annee']]=$nb[0]['nombreDossier'];
+                            foreach ($participation as $key2 => $part){
+                                $dossier_id=$part->getDossier()->getId();
+                                $libOragnisme=$part->getDossier()->getOrganismeEtranger()->getLibelleOrg();
+                                if($libOragnisme == $organismeLib){
+                                    $nb=$participationRepository->statParOrganisme($an['annee'],$cad['id'],$dossier_id);
+                                    $tab[$key][$an['annee']]=$nb[0]['nombreDossier'];
+                                }
+                                else
+                                $tab[$key][$an['annee']]=0;
                             }
-                            else
-                            $tab[$key][$an['annee']]=0;
 
                         }
                         else
