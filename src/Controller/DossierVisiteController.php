@@ -48,6 +48,7 @@ class DossierVisiteController extends AbstractController
             $datas[$key]['date_limite_reponce'] = $dossier->getDateLimiteReponce();
             $datas[$key]['statut'] = $dossier->getStatut();
             $datas[$key]['langues'] = $dossier->getLangues();
+            $datas[$key]['ville'] = $dossier->getVille();
             $datas[$key]['pays_destination_id'] = $dossier->getPaysDestination()->getLibellePays();
             $datas[$key]['organisme_etranger_id'] = $dossier->getOrganismeEtranger()->getLibelleOrg();
             $datas[$key]['date'] = $dossier->getDate();
@@ -80,7 +81,9 @@ class DossierVisiteController extends AbstractController
             $datas[$key]['organisme_etranger_lib'] = $dossier->getOrganismeEtranger()->getLibelleOrg();
             $datas[$key]['date_envoi_documents'] = $dossier->getDateEnvoiDocuments();
             $cadres=array();
-            $participations=$participationRepository->findAll();
+            $participations=$participationRepository->findBy([
+                'dossier' => $dossier->getId()
+            ]);
             $i=0;
             foreach ($participations as $key => $participe){
                 $cadres[$i]=$participe->getCadre();
@@ -133,6 +136,7 @@ class DossierVisiteController extends AbstractController
         $date_fin =  isset($data['date_fin']) ? $data['date_fin'] : null;
         $date_limite_rep =  isset($data['date_limite_reponce']) ? $data['date_limite_reponce'] : null;
         $type_visite =  isset($data['type_visite']) ? $data['type_visite'] : null;
+        $annee=isset($data['annee']) ? $data['annee'] : null;
         $nbr_participant_ins =  isset($data['nbr_participant_ins']) ? $data['nbr_participant_ins'] : null;
         $nbr_participant_sp =  isset($data['nbr_participant_sp']) ? $data['nbr_participant_sp'] : null;
         $frais_transport =  isset($data['frais_transport']) ? $data['frais_transport'] : null;
@@ -203,7 +207,7 @@ class DossierVisiteController extends AbstractController
                 
                 $participation->setDossier($dossiervisite);
                 $participation->setCadre($cadreINS);
-                $participation->setAnnee($annee);///// annee
+                $participation->setAnnee($annee);
                 $entityManager->persist($participation);
                 $entityManager->flush();   
                }
@@ -246,7 +250,9 @@ class DossierVisiteController extends AbstractController
         $datas[0]['date'] = $dossier->getDate();
         $datas[0]['date_envoi_documents'] = $dossier->getDateEnvoiDocuments();
         $cadres=array();
-        $participations=$participationRepository->findAll();
+        $participations=$participationRepository->findBy([
+            'dossier' => $id
+        ]);
         $i=0;
         foreach ($participations as $key => $participe){
             $cadres[$i]=$participe->getCadre();
@@ -357,17 +363,4 @@ class DossierVisiteController extends AbstractController
         
     }
 
-    /**
-     * @Route("/updateStatut", name="dossiervisite_statut", methods={"PUT"})
-     */
-    public function updateStatut(Dossiervisite $dossiervisite): Response
-    {
-        
-            $entityManager = $this->getDoctrine()->getManager();
-            $entityManager->remove($dossiervisite);
-            $entityManager->flush();
-        
-
-        return new JsonResponse("deleted!!");
-    }
 }
