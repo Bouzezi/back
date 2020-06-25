@@ -39,7 +39,7 @@ class OrganismeEtrangerController extends AbstractController
         $data = json_decode($request->getContent(),true);
 
         
-        $libelle_org =  isset($data['libelle_org']) ? $data['libelle_org'] : null;
+        $libelle_org =  isset($data['libelle']) ? $data['libelle'] : null;
      
         $Organismes->setLibelleOrg($libelle_org);
         
@@ -54,30 +54,36 @@ class OrganismeEtrangerController extends AbstractController
     }
 
     /**
-     * @Route("/{libelle_org}", name="organismeEtranger_show", methods={"GET"})
+     * @Route("/{id}", name="organismeEtranger_show", methods={"GET"})
      */
-    public function show(OrganismeEtranger $organismeEtranger): Response
+    public function show($id): Response
     {
-        
+        $organismeEtranger = $this->getDoctrine()
+        ->getRepository(OrganismeEtranger::class)
+        ->find($id);
         $datas=array();
-        
+        if($organismeEtranger != null){
+           
             $datas[0]['id'] = $organismeEtranger->getId();
             $datas[0]['libelle_org'] = $organismeEtranger->getLibelleOrg();
             
-        
+        }
         return new JsonResponse($datas);
     }
 
     /**
-     * @Route("/{id}/edit", name="organismeEtranger", methods={"GET","PUT"})
+     * @Route("/edit/{id}", name="organismeEtranger", methods={"GET","PUT"})
      */
-    public function edit(Request $request, OrganismeEtranger $organismeEtranger): Response
+    public function edit(Request $request, $id): Response
     {
         $data = json_decode($request->getContent(),true);
 
-        $libelle_org =  isset($data['libelle_org']) ? $data['libelle_org'] : null;
+        $libelle_org =  isset($data['libelle']) ? $data['libelle'] : null;
+        $organismeEtranger = $this->getDoctrine()
+        ->getRepository(OrganismeEtranger::class)
+        ->find($id);
 
-        if($organismeEtranger->getId() != null){
+        if($organismeEtranger != null){
             
             $organismeEtranger->setLibelleOrg($libelle_org);
 
