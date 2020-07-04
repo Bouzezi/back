@@ -33,24 +33,17 @@ class DirectionCentraleController extends AbstractController
      */
     public function new(Request $request): Response
     {
-        
-
-        $Organismes = new DirectionCentrale();
+    
+        $direction = new DirectionCentrale();
         $data = json_decode($request->getContent(),true);
 
-        
         $libelle_direction =  isset($data['libelle_direction']) ? $data['libelle_direction'] : null;
-     
-        $Organismes->setLibelleDirection($libelle_direction);
-        
-
-            $entityManager = $this->getDoctrine()->getManager();
-            
-            $entityManager->persist($Organismes);
+        $direction->setLibelleDirection($libelle_direction);
+            $entityManager = $this->getDoctrine()->getManager();         
+            $entityManager->persist($direction);
             $entityManager->flush();
             
-            return new JsonResponse($data);
-            
+            return new JsonResponse($data);          
     }
 
     /**
