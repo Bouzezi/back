@@ -54,5 +54,5 @@ class AuthController extends AbstractController
     {
         return new Response(sprintf('Logged in as %s', $this->getUser()->getUsername()));
     }
-    // public function setdefaultoptions(optionsresolverinterface $resolver)     {         $resolver->setdefaults(array(             'data_class' => 'sf2\userbundle\entity\user',         ));     } 
+   
 }

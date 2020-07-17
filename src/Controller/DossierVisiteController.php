@@ -63,58 +63,40 @@ class DossierVisiteController extends AbstractController
      */
     public function suivi(DossierVisiteRepository $dossiervisiteRepository,ParticipationRepository $participationRepository): JsonResponse
     {
-        $dossiers=$dossiervisiteRepository->findAll();
         $datas=array();
-        $cadres=array();
-        foreach ($dossiers as $key => $dossier){
-            $datas[$key]['id_dossier'] = $dossier->getId();
-            $datas[$key]['date_arrive_visite'] = $dossier->getDateArriveInvitation();
-            $datas[$key]['nature'] = $dossier->getNature();
-            $datas[$key]['sujet'] = $dossier->getSujet();
-            $datas[$key]['date_deb'] = $dossier->getDateDebut();
-            $datas[$key]['date_fin'] = $dossier->getDateFin();
-            $datas[$key]['type_visite'] = $dossier->getTypeVisite();
-            $datas[$key]['frais_transport'] = $dossier->getFraisTransport();
-            $datas[$key]['frais_residence'] = $dossier->getFraisResidence();
-            $datas[$key]['pays_destination_lib'] = $dossier->getPaysDestination()->getLibellePays();
-            $datas[$key]['ville'] = $dossier->getVille();
-            $datas[$key]['organisme_etranger_lib'] = $dossier->getOrganismeEtranger()->getLibelleOrg();
-            $datas[$key]['date_envoi_documents'] = $dossier->getDateEnvoiDocuments();
-            $cadres=array();
-            $participations=$participationRepository->findBy([
-                'dossier' => $dossier->getId()
-            ]);
-            $i=0;
-            foreach ($participations as $key => $participe){
-                $cadres[$i]=$participe->getCadre();
-                $i++;
-            }
-            
-            $c=array();
-            foreach ($cadres as $key1 => $cadre){
-                $c[$key1]['id_cadre']=$cadre->getId();
-                $c[$key1]['nom']=$cadre->getNom();
-                $c[$key1]['prenom']=$cadre->getPrenom();
-                $c[$key1]['grade']=$cadre->getGrade();
-                $c[$key1]['fonction']=$cadre->getFonction();
-                $c[$key1]['direction']=$cadre->getDirectionCentrale()->getLibelleDirection();
-                $fiche = $this->getDoctrine()
+        $participations=$participationRepository->findAll();
+        foreach ($participations as $key => $participe){
+            $datas[$key]['id_cadre']=$participe->getCadre()->getId();
+            $datas[$key]['nom']=$participe->getCadre()->getNom();
+            $datas[$key]['prenom']=$participe->getCadre()->getPrenom();
+            $datas[$key]['grade']=$participe->getCadre()->getGrade();
+            $datas[$key]['fonction']=$participe->getCadre()->getFonction();
+            $datas[$key]['direction']=$participe->getCadre()->getDirectionCentrale()->getLibelleDirection();
+
+            $datas[$key]['id_dossier'] = $participe->getDossier()->getId();
+            $datas[$key]['date_arrive_visite'] = $participe->getDossier()->getDateArriveInvitation();
+            $datas[$key]['nature'] = $participe->getDossier()->getNature();
+            $datas[$key]['sujet'] = $participe->getDossier()->getSujet();
+            $datas[$key]['date_deb'] = $participe->getDossier()->getDateDebut();
+            $datas[$key]['date_fin'] = $participe->getDossier()->getDateFin();
+            $datas[$key]['type_visite'] = $participe->getDossier()->getTypeVisite();
+            $datas[$key]['frais_transport'] = $participe->getDossier()->getFraisTransport();
+            $datas[$key]['frais_residence'] = $participe->getDossier()->getFraisResidence();
+            $datas[$key]['pays_destination_lib'] = $participe->getDossier()->getPaysDestination()->getLibellePays();
+            $datas[$key]['ville'] = $participe->getDossier()->getVille();
+            $datas[$key]['organisme_etranger_lib'] = $participe->getDossier()->getOrganismeEtranger()->getLibelleOrg();
+            $datas[$key]['date_envoi_documents'] = $participe->getDossier()->getDateEnvoiDocuments();
+
+            $fiche = $this->getDoctrine()
                 ->getRepository(FicheRenseignement::class)
                 ->findOneBy([
-                    'cadreINS' => $cadre->getId(),
-                    'dossierVisite' => $dossier
+                    'cadreINS' => $participe->getCadre()->getId(),
+                    'dossierVisite' => $participe->getDossier()
                 ]);
                 if($fiche != null){
                     $datas[$key]['objectif_visite'] = $fiche->getObjectifVisite(); 
                     $datas[$key]['date_envoie_rapport'] = $fiche->getDateEnvoieRapport();
                 }
-                
-            }
-            $datas[$key]['cadre_participe']=$c;
-            
-            
-            
-            
         }
         return new JsonResponse($datas);
     }

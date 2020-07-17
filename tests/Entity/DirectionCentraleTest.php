@@ -3,28 +3,30 @@
 namespace App\tests\Entity;
 use App\Entity\DirectionCentrale;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
-use Symfony\Component\Validator\Validation;
-use Symfony\Component\Validator\Constraints as Assert;
+
+
 class DirectionCentraleTest extends KernelTestCase 
 {
     public function getEntity(): DirectionCentrale{
-        return (new DirectionCentrale())
-                ->setLibelleDirection("direction");
+        return (new DirectionCentrale())->setLibelleDirection('direction');
     }
-    public function assertHasErrors(DirectionCentrale $direction, int $number = 0){
-        $validator = Validation::createValidator();
+
+    public function assertHasErrors(DirectionCentrale $code, int $number=0){
+        
         self::bootKernel();
-        $errors = $validator->validate($direction);
-        $this->assertCount($number, $errors);
+        $error=self::$container->get('validator')->validate($code);
+        $this->assertCount($number, $error);
         
     }
-    public function testValidEntity()
+    public function testValidEntityDirection()
     {
-        $this->assertHasErrors($this->getEntity(), 0);
+        
+       $this->assertHasErrors($code =$this->getEntity(),0);
     }
+
     public function testInvalidBlankCodeEntity()
     {
-        $this->assertHasErrors($this->getEntity()->setLibelleDirection(""), 1);
+        $this->assertHasErrors($code=$this->getEntity()->setLibelleDirection(''), 1);
         
     }
 }

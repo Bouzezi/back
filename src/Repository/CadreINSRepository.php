@@ -47,4 +47,15 @@ class CadreINSRepository extends ServiceEntityRepository
         ;
     }
     */
+    public function nbrCadre()
+    {
+        $entityManager = $this->getEntityManager();
+
+        $query = $entityManager->createQuery(
+            'SELECT COUNT(c.id)
+            FROM App\Entity\CadreINS c
+            '
+        );
+        return $query->setMaxResults(1)->getOneOrNullResult();
+    }
 }

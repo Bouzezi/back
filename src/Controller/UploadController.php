@@ -40,20 +40,23 @@ class UploadController extends AbstractController
      */
     public function  cadreUpload(Request $request){
         $data = json_decode($request->getContent(),true);
-        $tabCadres =  isset($data['tableauCadre']) ? $data['tableauCadre'] : null;
-        for($i=0;$i<count($tabCadres);$i++) {
+        $id =  isset($data['id']) ? $data['id'] : null;
             $cadre= $this->getDoctrine()
             ->getRepository(CadreINS::class)
-            ->find($tabCadres[$i]);
-            $rapport=new Rapport();
-            $rapport->setCadre($cadre);
-            $rapport->setPath("C:\xampp\htdocs\backend_pfe\public\uploads");
-            $entityManager = $this->getDoctrine()->getManager();
-            $entityManager->persist($rapport);
-            $entityManager->flush();
-            $cadre->addRapport($rapport);
-        }
-        return new JsonResponse("rapport ajoutée "); 
+            ->find($id);
+            if($cadre != null){
+                $rapport=new Rapport();
+                $rapport->setCadre($cadre);
+                $rapport->setPath("C:\xampp\htdocs\backend_pfe\public\uploads");
+                $entityManager = $this->getDoctrine()->getManager();
+                $entityManager->persist($rapport);
+                $entityManager->flush();
+                $cadre->addRapport($rapport);    
+                return new JsonResponse("rapport ajoutée "); 
+            }
+            else
+            return new JsonResponse("verifier le cadre"); 
+            
     }
 
 }

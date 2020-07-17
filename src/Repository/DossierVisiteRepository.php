@@ -47,4 +47,36 @@ class DossierVisiteRepository extends ServiceEntityRepository
         ;
     }
     */
+    public function nbrDossier()
+    {
+        $entityManager = $this->getEntityManager();
+        $query = $entityManager->createQuery(
+            'SELECT COUNT(d.id)
+            FROM App\Entity\DossierVisite d'
+        );
+        return $query->setMaxResults(1)->getOneOrNullResult();
+    }
+
+    public function nbrDossierMission()
+    {
+        $entityManager = $this->getEntityManager();
+
+        $query = $entityManager->createQuery(
+            'SELECT COUNT(d.id)
+            FROM App\Entity\DossierVisite d
+            WHERE d.type_visite = :typeVisite'
+        )->setParameter('typeVisite', 'mission');
+        return $query->setMaxResults(1)->getOneOrNullResult();
+    }
+    public function nbrDossierFormation()
+    {
+        $entityManager = $this->getEntityManager();
+
+        $query = $entityManager->createQuery(
+            'SELECT COUNT(d.id)
+            FROM App\Entity\DossierVisite d
+            WHERE d.type_visite = :typeVisite'
+        )->setParameter('typeVisite', 'formation');
+        return $query->setMaxResults(1)->getOneOrNullResult();
+    }
 }
