@@ -8,6 +8,7 @@ use Symfony\Component\HttpFoundation\Response;
 use App\Entity\User;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use symfony\component\optionsresolver\optionsresolverinterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 class AuthController extends AbstractController
 {
@@ -47,7 +48,7 @@ class AuthController extends AbstractController
             }
             
         }
-        return new Response('Password %s successfully changed');
+        return new JsonResponse('Password  successfully changed');
     }
 
     public function api()

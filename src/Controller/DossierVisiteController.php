@@ -104,7 +104,7 @@ class DossierVisiteController extends AbstractController
     /**
      * @Route("/new", name="dossiervisite_new", methods={"POST"})
      */
-    public function new(Request $request): Response
+    public function new(Request $request): JsonResponse
     {
         
 
