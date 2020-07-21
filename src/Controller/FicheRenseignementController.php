@@ -139,7 +139,7 @@ class FicheRenseignementController extends AbstractController
         ->find($id);
         $data = json_decode($request->getContent(),true);
 
-        $date =  $data['date'];
+        $date =  isset($data['date']) ? $data['date'] : null;
         $autre_frais =  isset($data['autre_frais']) ? $data['autre_frais'] : null;
         $objectif_visite =  isset($data['objectif_visite']) ? $data['objectif_visite'] : null;
         $relation_participant_visite =  isset($data['relation_participant_visite']) ? $data['relation_participant_visite'] : null;

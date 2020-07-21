@@ -131,7 +131,7 @@ class DossierVisite
     private $bordereau;
 
     /**
-     * @ORM\Column(type="string", length=10)
+     * @ORM\Column(type="string", length=10, nullable=true)
      */
     private $date;
 
